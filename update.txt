@@ -1,0 +1,83 @@
+-Заполнить справочник
+insert into "Payments" ("bank_trans_type","bank_name")
+select distinct "bank_trans_type","bank_name"
+from "Sales_raw" sr 
+where "bank_trans_type" is not null -- исключаем пустые значения
+
+
+-- обновим информацию в listings raw
+update "Sales_raw" sr
+set "PaymentID" = p."PaymentID" 
+from "Payments" p
+where sr."bank_trans_type" = p."bank_trans_type" and sr."bank_name"=p."bank_name"
+
+ALTER TABLE "Sales_raw" ADD COLUMN "PaymentID" INTEGER;
+
+-Заполнить справочник
+insert into "Customers" (cust_name, cust_contact_no)
+select distinct cust_name, cust_contact_no
+from "Sales_raw" sr 
+where "cust_name" is not null -- исключаем пустые значения
+
+
+-- обновим информацию в listings raw
+update "Sales_raw" sr
+set "CustomerID" = c."CustomerID" 
+from "Customers" c
+where sr."cust_name" = c."cust_name" and sr."cust_contact_no" = c."cust_contact_no"
+
+ALTER TABLE "Sales_raw" ADD COLUMN "CustomerID" INTEGER;
+
+--ALTER TABLE "Sales_raw" DROP COLUMN "CustomerID";
+
+
+-Заполнить справочник
+insert into "Items"  (item_name, item_type, item_country, item_supplier)
+select distinct item_name, item_type, item_country, item_supplier
+from "Sales_raw" sr 
+where "item_name" is not null -- исключаем пустые значения
+
+
+-- обновим информацию в listings raw
+update "Sales_raw" sr
+set "ItemsID"  = i."ItemID" 
+from "Items" i
+where sr."item_name" = i."item_name" and sr."item_type" = i."item_type" and sr."item_country" = i."item_country" and sr."item_supplier" = i."item_supplier" 
+
+ALTER TABLE "Sales_raw" ADD COLUMN "ItemsID" INTEGER;
+
+-Заполнить справочник
+insert into "Stores"  (store_division , store_district, store_upazila)
+select distinct store_division , store_district, store_upazila
+from "Sales_raw" sr 
+where "store_division" is not null -- исключаем пустые значения
+
+
+-- обновим информацию в listings raw
+update "Sales_raw" sr
+set "StoreID" = st."StoreID" 
+from "Stores" st
+where sr."store_division" = st."store_division" and sr."store_district" = st."store_district" and sr."store_upazila" = st."store_upazila"
+
+ALTER TABLE "Sales_raw" ADD COLUMN "StoreID" INTEGER;
+
+
+
+insert into "Sales" 
+select 
+	"SalesID" ,
+	"PaymentID" ,
+	"CustomerID" ,
+	"ItemsID" ,
+	"StoreID" ,
+	"date_sales" ,
+	"quantity" ,
+	"unit_price",
+	"total_price", 
+	"unit" 
+from "Sales_raw"  
+
+--ALTER TABLE "Sales" DROP COLUMN "unit";
+--ALTER TABLE "Sales" add "unit" varchar(50);
+--truncate "Sales" 
+
